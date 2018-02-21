@@ -12,6 +12,14 @@ quantaxis的一些使用示例
 git clone https://github.com/[你的github账号]/qademo
 ```
 
+## 后台运行脚本
+
+```
+sudo chmod -R 777 ./qademo
+cd qademo
+sudo nohup ./startjupyter.sh &
+```
+
 ## 更新代码
 
 通过从 yutiansut/qademo 向你的项目推```pull request```来对项目进行更新
