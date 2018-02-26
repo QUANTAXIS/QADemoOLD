@@ -39,7 +39,12 @@ class Backtest(QA_Backtest):
         self.user = QA_User()
         mastrategy = MAStrategy()
         maminstrategy = MAMINStrategy()
+
+
         self.portfolio, self.account = self.user.register_account(mastrategy)
+
+        self.portfolio.add_account(MAStrategy())
+        
 
     def after_success(self):
         QA_util_log_info(self.account.history_table)
