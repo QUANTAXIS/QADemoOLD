@@ -45,24 +45,30 @@ risk=QA.QA_Risk(AC)
 """
 AC.reset_assets(100000)
 
+
 def simple_backtest(AC, code, start, end):
     DATA = QA.QA_fetch_stock_day_adv(code, start, end)
     for items in DATA.panel_gen:  # 一天过去了
         for item in items.security_gen:
-            if AC.sell_available.get(item.code[0], 0) == 0:# 如果持仓为0
+            if AC.sell_available.get(item.code[0], 0) == 0:  # 如果持仓为0
                 # order的生成办法是这样的
                 # 具体怎么下单 看你的 算法
-                # 
-                order=AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0], amount=1000, towards=QA.ORDER_DIRECTION.BUY, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
+                order = AC.send_order(
+                    code=item.data.code[0], time=item.data.date[0], 
+                    amount=1000, towards=QA.ORDER_DIRECTION.BUY, 
+                    price=0, order_model=QA.ORDER_MODEL.MARKET, 
+                    amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                 )
-                if order: #如果不能下单 会返还false 比如: 资金不够
+                if order:  # 如果不能下单 会返还false 比如: 资金不够
                     AC.receive_deal(B.receive_order(QA.QA_Event(order=order)))
 
-            else: #如果有持仓
+            else:  # 如果有持仓
                 # 持仓数量为 AC.sell_available.get(item.code[0], 0)
-                order=AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0], amount=1000, towards=QA.ORDER_DIRECTION.SELL, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
+                order = AC.send_order(
+                    code=item.data.code[0], time=item.data.date[0], 
+                    amount=1000, towards=QA.ORDER_DIRECTION.SELL, 
+                    price=0, order_model=QA.ORDER_MODEL.MARKET, 
+                    amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                 )
                 if order:
                     AC.receive_deal(B.receive_order(QA.QA_Event(order=order)))
