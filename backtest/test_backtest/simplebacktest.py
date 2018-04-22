@@ -43,7 +43,7 @@ AC.receive_deal(dealmes)
 risk=QA.QA_Risk(AC)
 
 """
-AC.reset_assets(100000)
+AC.reset_assets(100000) #设置account的资金
 
 
 def simple_backtest(AC, code, start, end):
@@ -54,9 +54,9 @@ def simple_backtest(AC, code, start, end):
                 # order的生成办法是这样的
                 # 具体怎么下单 看你的 算法
                 order = AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0], 
-                    amount=1000, towards=QA.ORDER_DIRECTION.BUY, 
-                    price=0, order_model=QA.ORDER_MODEL.MARKET, 
+                    code=item.data.code[0], time=item.data.date[0],
+                    amount=1000, towards=QA.ORDER_DIRECTION.BUY,
+                    price=0, order_model=QA.ORDER_MODEL.MARKET,
                     amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                 )
                 if order:  # 如果不能下单 会返还false 比如: 资金不够
@@ -65,9 +65,9 @@ def simple_backtest(AC, code, start, end):
             else:  # 如果有持仓
                 # 持仓数量为 AC.sell_available.get(item.code[0], 0)
                 order = AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0], 
-                    amount=1000, towards=QA.ORDER_DIRECTION.SELL, 
-                    price=0, order_model=QA.ORDER_MODEL.MARKET, 
+                    code=item.data.code[0], time=item.data.date[0],
+                    amount=1000, towards=QA.ORDER_DIRECTION.SELL,
+                    price=0, order_model=QA.ORDER_MODEL.MARKET,
                     amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                 )
                 if order:
