@@ -24,17 +24,21 @@
 
 
 import QUANTAXIS as QA
-
+import random
 """
+单线程模式回测示例
 该代码旨在给出一个极其容易实现的小回测 高效 无事件驱动
 """
 B = QA.QA_BacktestBroker()
 AC = QA.QA_Account()
 """
+# 账户设置初始资金
+AC.reset_assets(assets)
+
 # 发送订单
 Order=AC.send_order(code='000001',amount=1000,time='2018-03-21',towards=QA.ORDER_DIRECTION.BUY,price=0,order_model=QA.ORDER_MODEL.MARKET,amount_model=QA.AMOUNT_MODEL.BY_AMOUNT)
 # 撮合订单
-dealmes=B.receive_order(QA.QA_Event(order=Order))
+dealmes=B.receive_order(QA.QA_Event(order=Order,market_data=data))
 # 更新账户
 AC.receive_deal(dealmes)
 
@@ -43,40 +47,34 @@ AC.receive_deal(dealmes)
 risk=QA.QA_Risk(AC)
 
 """
-AC.reset_assets(100000) #设置account的资金
 
+AC.reset_assets(20000000) #设置初始资金
 
 def simple_backtest(AC, code, start, end):
-    DATA = QA.QA_fetch_stock_day_adv(code, start, end)
+    DATA = QA.QA_fetch_stock_day_adv(code, start, end).to_qfq()
     for items in DATA.panel_gen:  # 一天过去了
+        
         for item in items.security_gen:
-            if AC.sell_available.get(item.code[0], 0) == 0:  # 如果持仓为0
-                # order的生成办法是这样的
-                # 具体怎么下单 看你的 算法
-                order = AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0],
-                    amount=1000, towards=QA.ORDER_DIRECTION.BUY,
-                    price=0, order_model=QA.ORDER_MODEL.MARKET,
-                    amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
-                )
-                if order:  # 如果不能下单 会返还false 比如: 资金不够
-                    AC.receive_deal(B.receive_order(QA.QA_Event(order=order)))
+            if random.random()>0.5:# 加入一个随机 模拟买卖的
+                if AC.sell_available.get(item.code[0], 0) == 0:
+                    order=AC.send_order(
+                        code=item.data.code[0], time=item.data.date[0], amount=1000, towards=QA.ORDER_DIRECTION.BUY, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
+                    )
+                    if order:
+                        AC.receive_deal(B.receive_order(QA.QA_Event(order=order,market_data=item)))
 
-            else:  # 如果有持仓
-                # 持仓数量为 AC.sell_available.get(item.code[0], 0)
-                order = AC.send_order(
-                    code=item.data.code[0], time=item.data.date[0],
-                    amount=1000, towards=QA.ORDER_DIRECTION.SELL,
-                    price=0, order_model=QA.ORDER_MODEL.MARKET,
-                    amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
-                )
-                if order:
-                    AC.receive_deal(B.receive_order(QA.QA_Event(order=order)))
+                else:
+                    order=AC.send_order(
+                        code=item.data.code[0], time=item.data.date[0], amount=1000, towards=QA.ORDER_DIRECTION.SELL, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
+                    )
+                    if order:
+                        AC.receive_deal(B.receive_order(QA.QA_Event(order=order,market_data=item)))
         AC.settle()
 
 
-simple_backtest(AC, QA.QA_fetch_stock_block_adv(
-).code[0:10], '2017-01-01', '2018-01-31')
+simple_backtest(AC, QA.QA_fetch_stock_block_adv().code[0:10], '2017-01-01', '2018-01-31')
 print(AC.message)
+AC.save()
 risk = QA.QA_Risk(AC)
 print(risk.message)
+risk.save()
