@@ -33,25 +33,33 @@ from test_backtest.strategy import MAStrategy
 
 
 class Backtest(QA_Backtest):
+    '''
+    多线程模式回测示例
+
+    '''
 
     def __init__(self, market_type, frequence, start, end, code_list, commission_fee):
         super().__init__(market_type,  frequence, start, end, code_list, commission_fee)
         self.user = QA_User()
         mastrategy = MAStrategy()
         maminstrategy = MAMINStrategy()
+        # maminstrategy.reset_assets(1000)
+        # self.portfolio, self.account = self.user.register_account(mastrategy)
+        self.user = QA_User(user_cookie='user_admin')
+        self.portfolio = self.user.new_portfolio('folio_admin')
         self.portfolio, self.account = self.user.register_account(mastrategy)
 
     def after_success(self):
         QA_util_log_info(self.account.history_table)
-        risk = QA_Risk(self.account)
+        risk = QA_Risk(self.account, benchmark_code='000300',
+                       benchmark_type=MARKET_TYPE.INDEX_CN)
 
-        print(risk.assets)
-        print('annualize_return : {} %'.format(risk.annualize_return))
-        print('max_dropback : {} %'.format(risk.max_dropback))
-        print('profit : {} %'.format(risk.profit))
-        print('volatility : {}'.format(risk.volatility))
-
+        print(risk().T)
+        risk.plot_assets_curve()
+        risk.plot_dailyhold()
+        risk.plot_signal()
         self.account.save()
+        risk.save()
 
 
 def run_daybacktest():
@@ -59,7 +67,7 @@ def run_daybacktest():
     backtest = Backtest(market_type=MARKET_TYPE.STOCK_CN,
                         frequence=FREQUENCE.DAY,
                         start='2017-01-01',
-                        end='2017-01-10',
+                        end='2017-02-10',
                         code_list=QA.QA_fetch_stock_block_adv().code[0:5],
                         commission_fee=0.00015)
     backtest.start_market()
@@ -84,6 +92,5 @@ def run_minbacktest():
 
 if __name__ == '__main__':
     run_daybacktest()
-    # backtest._settle()
+    #run_minbacktest()
 
-    # backtest.run()
