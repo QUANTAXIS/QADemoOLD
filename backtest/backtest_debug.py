@@ -49,6 +49,11 @@ class Backtest(QA_Backtest):
         self.portfolio = self.user.new_portfolio('folio_admin')
         self.portfolio, self.account = self.user.register_account(mastrategy)
 
+        print(self.user)
+        print(self.portfolio)
+        print(self.account)
+        print(self.account.message)
+
     def after_success(self):
         QA_util_log_info(self.account.history_table)
         risk = QA_Risk(self.account, benchmark_code='000300',
