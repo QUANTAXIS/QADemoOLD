@@ -111,3 +111,5 @@ Risk.save()
 account_info = QA.QA_fetch_account({'account_cookie': 'user_admin_macd'})
 account = QA.QA_Account().from_message(account_info[0])
 print(account)
+
+QA.QA_SU_save_strategy('MACD_JCSC','Indicator',Account.account_cookie)
