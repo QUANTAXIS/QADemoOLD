@@ -32,7 +32,7 @@ import random
 Broker = QA.QA_BacktestBroker()
 User = QA.QA_User(username='quantaxis', password='quantaxis')
 Portfolio = User.new_portfolio('qatestportfolio')
-AC = Portfolio.new_account(account_cookie='simplebacktest', init_cash=200000)
+AC = Portfolio.new_account(account_cookie='supersimple', init_cash=200000)
 """
 # 账户设置初始资金
 AC.reset_assets(assets)
@@ -74,32 +74,16 @@ def simple_backtest(AC, code, start, end):
                         code=item.code[0], time=item.date[0], amount=1000, towards=QA.ORDER_DIRECTION.BUY, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                     )
                     if order:
-                        Broker.receive_order(QA.QA_Event(
-                            order=order, market_data=item))
-                        trade_mes = Broker.query_orders(
-                            AC.account_cookie, 'filled')
-                        res = trade_mes.loc[order.account_cookie,
-                                            order.realorder_id]
-                        print('order {} {} {} {}'.format(
-                            res.trade_id, res.trade_price, res.trade_amount, res.trade_time))
-                        order.trade(res.trade_id, res.trade_price,
-                                    res.trade_amount, res.trade_time)
+                        order.trade('unknownTrade', order.price,
+                                    order.amount, order.datetime)
 
                 else:
                     order = AC.send_order(
                         code=item.code[0], time=item.date[0], amount=1000, towards=QA.ORDER_DIRECTION.SELL, price=0, order_model=QA.ORDER_MODEL.MARKET, amount_model=QA.AMOUNT_MODEL.BY_AMOUNT
                     )
                     if order:
-                        Broker.receive_order(QA.QA_Event(
-                            order=order, market_data=item))
-                        trade_mes = Broker.query_orders(
-                            AC.account_cookie, 'filled')
-                        res = trade_mes.loc[order.account_cookie,
-                                            order.realorder_id]
-                        print('order {} {} {} {}'.format(
-                            res.trade_id, res.trade_price, res.trade_amount, res.trade_time))
-                        order.trade(res.trade_id, res.trade_price,
-                                    res.trade_amount, res.trade_time)
+                        order.trade('unknownTrade', order.price,
+                                    order.amount, order.datetime)
         AC.settle()
 
 
